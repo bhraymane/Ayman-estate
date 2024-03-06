@@ -16,7 +16,7 @@ const Home = () => {
           <img src={MobileBg} alt="mobile image" className=' max-lg:block absolute hidden z-[-9] -bottom-16   ' />
           </h1>
           <p className='max-w-md text-gray-400 text-justify mt-6 max-lg:hidden '>It is a long established fact that a reader will be distracted by the readable content of a page</p>
-          <form className='bg-slate-100 flex justify-between p-3 rounded-xl relative shadow-xl mt-5 max-lg:w-[60%] max-sm:w-full max-sm:text-sm'>
+          <form className='bg-slate-100 flex justify-between p-3 rounded-xl relative shadow-xl mt-8  max-lg:w-[60%] max-sm:w-full max-sm:text-sm'>
             <div className='flex justify-center items-center gap-3  '>
               <HiSearch size={25} color='#3F86FA' />
               <input type="text" placeholder='Search' className='bg-transparent absolute h-full w-full right-0 rounded-xl px-12 focus:outline-none' />

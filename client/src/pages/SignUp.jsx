@@ -39,6 +39,11 @@ const SignUp = () => {
       if (data.success === false) {
         setLoading(false);
         setError(data.message);
+        toast({
+          icon: <MdError size={30} />,
+          className:"bg-red-600 text-white font-semibold font-poppins",
+          description:data.message
+        })
         
         return;
       }
@@ -64,8 +69,8 @@ const SignUp = () => {
   };
 
   return ( 
-    <div className='flex justify-center items-center font-poppins mt-8 mx-4'>
-      <div className=' rounded-xl flex justify-between items-center p-3 shadow-xl max-lg:w-[80%] max-sm:w-auto '>
+    <div className='flex justify-center items-center font-poppins mt-8 mx-4 '>
+      <div className=' rounded-xl flex justify-between items-center p-3 shadow-xl max-lg:w-[80%] max-sm:w-auto  '>
         <div className="flex min-h-full flex-col justify-center  px-2  lg:px-8 max-lg:w-full ">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm relative ">
           <img
@@ -80,7 +85,7 @@ const SignUp = () => {
         </div>
 
         <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-4" action="#" method="POST">
+          <form onSubmit={handleSubmit} className="space-y-4"  >
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
                 UserName
