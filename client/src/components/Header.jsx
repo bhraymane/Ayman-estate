@@ -3,9 +3,13 @@ import { navLinks } from '../constants'
 import { TbH1, TbMenuDeep } from "react-icons/tb";
 import { CgClose } from "react-icons/cg";
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const Header = () => {
   const [toggle,setToggle]=useState(true)
+
+  const {currentUser} = useSelector(state=> state.user)
+
   return (
     <header className='flex justify-between items-center max-w-screen-2xl mx-auto font-poppins m-3 p-3 md:px-16 sticky top-3 z-50'>
       <Link to='/'>
@@ -22,10 +26,12 @@ const Header = () => {
         ))}
         </ul>
 
-        <Link to='/sign-in'>
-          <button className='bg-primary rounded-lg text-white px-10 py-2'>
-            Sign In
-          </button>
+        <Link to={currentUser ? "/profile ": '/sign-in' }>
+          {currentUser ? <img src={currentUser.avatar} alt='profile' className='rounded-full object-cover w-10  hover:grayscale  ' /> 
+            : 
+            <button className='bg-primary rounded-lg text-white w-full px-6 py-2 mt-2'>
+              Sign In
+            </button> }
         </Link>
 
         
@@ -44,10 +50,13 @@ const Header = () => {
                   </li>
                             ))}
               </ul>
-              <Link to='/sign-in'>
+              <Link to='/sign-in' >
+                {currentUser ? <img src={currentUser.avatar} alt='profile' className='rounded-full object-cover w-10 mx-auto' /> 
+                : 
                 <button className='bg-primary rounded-lg text-white w-full  py-2 mt-2'>
                   Sign In
-                </button>
+                </button> }
+                
               </Link>
 
               
