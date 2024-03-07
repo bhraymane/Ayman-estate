@@ -6,6 +6,10 @@ const userSchema = new mongoose.Schema({
         require: true,
         unique:true,
     },
+    Profilename :{
+        type:"string",
+        default:"Profile"
+    },
     email :{
         type:"string",
         require: true,

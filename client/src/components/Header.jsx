@@ -11,13 +11,16 @@ const Header = () => {
   const {currentUser} = useSelector(state=> state.user)
 
   return (
-    <header className='flex justify-between items-center max-w-screen-2xl mx-auto font-poppins m-3 p-3 md:px-16 sticky top-3 z-50'>
+    <header className=' font-poppins fixed  z-50 top-0  w-full '>
+      <div className='flex justify-between items-center max-w-screen-2xl mx-auto m-3 p-3 md:px-16'>
+
+      
       <Link to='/'>
         <img src="/LOGO.svg" alt="logo"  className=' w-12' />
       </Link>
       
 
-      <div className='flex justify-between items-center gap-16 text-lg text-gray-400 max-lg:hidden'>
+      <div className='flex justify-between items-center gap-16 text-lg text-gray-400 max-lg:hidden '>
         <ul className='flex gap-6 items-center '>
         {navLinks.map((link,index)=>(
           <li  key={index} className='hover:text-gray-800'>
@@ -50,7 +53,7 @@ const Header = () => {
                   </li>
                             ))}
               </ul>
-              <Link to='/sign-in' >
+              <Link to={currentUser ? "/profile ": '/sign-in' } >
                 {currentUser ? <img src={currentUser.avatar} alt='profile' className='rounded-full object-cover w-10 mx-auto' /> 
                 : 
                 <button className='bg-primary rounded-lg text-white w-full  py-2 mt-2'>
@@ -70,7 +73,7 @@ const Header = () => {
       </div>
       
 
-
+    </div>
     </header>
   )
 }

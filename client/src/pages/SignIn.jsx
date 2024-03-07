@@ -72,7 +72,7 @@ const SignIn = () => {
   };
 
   return ( 
-    <div className='flex justify-center items-center font-poppins mt-8 mx-4 '>
+    <div className='flex justify-center items-center font-poppins mt-28 mx-4 '>
       <div className=' rounded-xl flex justify-between items-center p-3 shadow-xl max-lg:w-[80%] max-sm:w-auto  '>
         <div className="flex flex-col justify-center  px-2  lg:px-8 max-lg:w-full ">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm relative ">

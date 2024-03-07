@@ -5,7 +5,7 @@ import { HiSearch } from "react-icons/hi";
 import { status } from '../constants';
 const Home = () => {
   return (
-    <main className='max-w-screen-2xl mx-auto font-poppins  m-5 p-3 md:px-16  '>
+    <main className='max-w-screen-2xl mx-auto font-poppins  m-5 p-3 md:px-16 mt-28  '>
       <div className='flex justify-between gap-8 '>
         <div className='max-lg:text-center flex flex-col max-lg:justify-center max-lg:items-center max-lg:w-full  '>
           <h1 className='text-7xl font-semibold leading-normal mt-6 max-xl:text-6xl relative max-lg:w-full max-sm:text-4xl '>
