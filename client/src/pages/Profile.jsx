@@ -1,24 +1,66 @@
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {  useSelector } from "react-redux";
 import {  FaUser } from "react-icons/fa";
 import OAuth from "@/components/OAuth";
 import { Link } from "react-router-dom";
 import { PiSignOutBold } from "react-icons/pi";
-import { MdDelete } from "react-icons/md";
-
+import { MdDelete, MdError } from "react-icons/md";
+import { MdOutlineFileUpload } from "react-icons/md";
+import {getDownloadURL, getStorage,ref, uploadBytesResumable} from "firebase/storage";
+import { app } from "@/firebase";
+import { useToast } from "@/components/ui/use-toast";
 
 const Profile = () => {
   const {currentUser,loading} = useSelector(state=> state.user)
+  const fileRef = useRef(null)
+  const [file,setFile]= useState(undefined)
+  const [filePrec,setFilePrec]=useState(0)
+  const [fileUploadError, setFileUploadError] = useState(false);
+  const [formData,setFormData]=useState({})
+  const { toast } = useToast()
   
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+
+  useEffect(()=>{
+      if(file){
+        handelFileUpload(file);
+      }
+  },[file])
+
+  const handelFileUpload=(file)=>{
+    const storage = getStorage(app);  
+    const fileName= new Date().getTime() + file.name
+    const storageRef= ref(storage, fileName) 
+    const uploadTask = uploadBytesResumable(storageRef,file)
+    
+
+    uploadTask.on('state_changed',(snapshot)=>{
+      const progress= (snapshot.bytesTransferred /snapshot.totalBytes) * 100
+      setFilePrec(Math.round(progress))
+    },(error) => {
+      setFileUploadError(true)
+    },
+    ()=>{
+      getDownloadURL(uploadTask.snapshot.ref).then(
+        (downloadURL)=>setFormData({...formData, avatar : downloadURL})
+      )
+    }
+    )
+    
+  }
+
+
 
   function togglePasswordVisibility() {
     setIsPasswordVisible((prevState) => !prevState);
   }
 
+  
+
   return (
     <div className="font-poppins">
-      <section className="relative block h-[500px] max-sm:h-[400px]  " >
+      <section className="relative block h-[500px] max-sm:h-[400px] " >
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover brightness-50 "
           style={{
@@ -28,7 +70,7 @@ const Profile = () => {
         >
           
         </div>
-        <div className="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-[70px]">
+        <div className="top-auto -bottom-1 left-0 right-0 w-full absolute ">
           <svg
             className="absolute bottom-0 overflow-hidden"
             xmlns="http://www.w3.org/2000/svg"
@@ -46,17 +88,24 @@ const Profile = () => {
         </div>
       </section>
 
-      <section className="relative py-16 bg-white">
-        <div className="container mx-auto lg:px-16 sm:max-w-3xl ">
-          <div className="relative flex flex-col bg-white shadow-xl rounded-lg -mt-80">
-            <div>
-              <div className="flex justify-center ">       
-                  <div >
-                    <img alt="Profile" src={currentUser.avatar} className="shadow-lg rounded-full h-auto -mt-10 max-w-[150px] "/>
-                  </div>             
-              </div>
+      <section className="relative py-8 bg-white">
+        <div className="container mx-auto lg:px-16 sm:max-w-2xl ">
+          <div className=" bg-white shadow-xl rounded-lg -mt-80">
+              <div className="flex justify-center flex-col items-center relative ">       
+                  <div className="" >
+                    <img  alt="Profile" onClick={()=>fileRef.current.click()} src={formData.avatar || currentUser.avatar} className="shadow-lg rounded-full h-[100px] -mt-10 w-[100px] object-cover cursor-pointer hover:brightness-50 "/>          
+                  </div>   
+                  
+                  <div className="absolute -bottom-6">
+                    {fileUploadError ? ( <span className="font-semibold text-red-600 text-xs">  Image should be less then 2 mb </span> ) 
+                    : filePrec > 0 && filePrec < 100 ? (<span className="font-semibold text-slate-600 text-xs"> {`Uploading ${filePrec}%`} </span>    )                   
+                    : "" }  
+                  </div>
 
-              <div className="text-center mt-4">
+                         
+              </div>
+              
+              <div className="text-center mt-5">
                 <h3 className="text-4xl font-semibold leading-normal text-gray-800 max-sm:text-3xl ">
                   {currentUser.Profilename}
                 </h3>
@@ -69,34 +118,31 @@ const Profile = () => {
 
                 <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-6">
                   <form  className="space-y-4"  >
-                    <div>                  
+                       <input onChange={(e)=>setFile(e.target.files[0])} type="file" ref={fileRef} hidden accept="image/*" />               
                       <div className="mt-1">
                         <input
                           id="username"
                           name="username"
                           type="text"
                           autoComplete="username"
-                          required
+                          
                           placeholder="Username"
                           className="block w-full focus:outline-none rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                         />
                       </div>
-                    </div>
-
-                    <div>               
+                    
+                                  
                       <div className="mt-1">
                         <input
                           id="email"
                           name="email"
                           type="email"
                           autoComplete="email"
-                          required
+                          
                           placeholder="email address"              
                           className="block w-full focus:outline-none  rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                       </div>
-                    </div>
-
-                    <div>                      
+                                                         
                       <div className="mt-1 relative">
                         <input
                           id="password"
@@ -104,7 +150,7 @@ const Profile = () => {
                           type={isPasswordVisible ? "text" : "password"}
                           autoComplete="current-password"
                           placeholder="Password"
-                          required
+                          
                           
                           className="block focus:outline-none w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                         />
@@ -151,12 +197,12 @@ const Profile = () => {
                         )}
                       </button>
                       </div>
-                    </div>
+                    
 
                     <div>
                       <button
                         disabled={loading}
-                        className="flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         {loading ? 
                         <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -165,31 +211,12 @@ const Profile = () => {
                         </svg> :  'Update'}
                       </button>
                     </div>
-              </form>
 
-          
-
-          <p className="mt-10 text-center text-sm text-gray-500">
-          Already have an account?{' '}
-            <Link to={"/sign-in"}>
-              <span className="font-semibold leading-6 text-primary hover:text-[#90adff]">
-                Sign In
-              </span>
-            </Link>
-            
-          </p>
-
-
-
-        </div>
-
-      </div>
-
-              <div className="mt-3 py-3 border-t border-gray-300 text-center">
-                <div className="flex justify-between items-center px-6 ">
+                    <div className="mt-3 py-5 border-t border-gray-300">
+                <div className="flex justify-between items-center ">
                     <button
                         disabled={loading}
-                        className="flex  justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         {loading ? 
                         <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -200,7 +227,7 @@ const Profile = () => {
 
                     <button
                         disabled={loading}
-                        className="flex  justify-center rounded-md bg-red-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         {loading ? 
                         <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -214,7 +241,16 @@ const Profile = () => {
                   
                 </div>
               </div>
-            </div>
+
+              </form>
+
+                </div>
+
+              </div>
+
+              
+
+            
           </div>
         </div>
       </section>
