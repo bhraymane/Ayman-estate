@@ -5,10 +5,9 @@ import OAuth from "@/components/OAuth";
 import { Link } from "react-router-dom";
 import { PiSignOutBold } from "react-icons/pi";
 import { MdDelete, MdError } from "react-icons/md";
-import { MdOutlineFileUpload } from "react-icons/md";
 import {getDownloadURL, getStorage,ref, uploadBytesResumable} from "firebase/storage";
 import { app } from "@/firebase";
-import { useToast } from "@/components/ui/use-toast";
+
 
 const Profile = () => {
   const {currentUser,loading} = useSelector(state=> state.user)
@@ -17,7 +16,7 @@ const Profile = () => {
   const [filePrec,setFilePrec]=useState(0)
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData,setFormData]=useState({})
-  const { toast } = useToast()
+
   
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -125,7 +124,8 @@ const Profile = () => {
                           name="username"
                           type="text"
                           autoComplete="username"
-                          
+
+                          defaultValue={currentUser.username}
                           placeholder="Username"
                           className="block w-full focus:outline-none rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                         />
@@ -139,6 +139,7 @@ const Profile = () => {
                           type="email"
                           autoComplete="email"
                           
+                          defaultValue={currentUser.email}
                           placeholder="email address"              
                           className="block w-full focus:outline-none  rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                       </div>
