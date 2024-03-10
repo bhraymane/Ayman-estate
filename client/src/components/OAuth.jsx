@@ -3,7 +3,7 @@ import { RiGoogleFill } from 'react-icons/ri'
 import {GoogleAuthProvider, getAuth, signInWithPopup} from "firebase/auth"
 import { app } from '@/firebase'
 import { useDispatch, useSelector } from 'react-redux'
-import { signInSuccess } from '@/redux/user/userSlice'
+import { Success } from '@/redux/user/userSlice'
 import { MdError } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
 
@@ -32,7 +32,7 @@ const OAuth = () => {
                 })
             })
             const data=await res.json()
-            dispatch(signInSuccess(data))
+            dispatch(Success(data))
             navigate('/')
         } catch (error) {
             toast({

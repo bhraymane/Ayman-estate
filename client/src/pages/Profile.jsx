@@ -1,21 +1,42 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+
+
+
 import { useEffect, useRef, useState } from "react";
-import {  useSelector } from "react-redux";
+import {  useSelector, useDispatch } from "react-redux";
 import {  FaUser } from "react-icons/fa";
 import OAuth from "@/components/OAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PiSignOutBold } from "react-icons/pi";
 import { MdDelete, MdError } from "react-icons/md";
 import {getDownloadURL, getStorage,ref, uploadBytesResumable} from "firebase/storage";
 import { app } from "@/firebase";
+import { Start,Failure, Success,deleteUserSuccess } from '@/redux/user/userSlice';
+import { toast } from "@/components/ui/use-toast";
+import { BsFillBookmarkCheckFill } from "react-icons/bs";
+
 
 
 const Profile = () => {
-  const {currentUser,loading} = useSelector(state=> state.user)
+  const {currentUser,loading, error} = useSelector(state=> state.user)
   const fileRef = useRef(null)
   const [file,setFile]= useState(undefined)
   const [filePrec,setFilePrec]=useState(0)
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData,setFormData]=useState({})
+  const dispatch= useDispatch()
+  const navigate =useNavigate()
 
   
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -55,6 +76,75 @@ const Profile = () => {
     setIsPasswordVisible((prevState) => !prevState);
   }
 
+  const handelChange =(e)=>{
+    setFormData({
+      ...formData,
+      [e.target.id]:e.target.value
+    })
+  }
+
+  const handelSubmit= async (e)=>{
+    e.preventDefault()
+    try {
+      dispatch(Start())
+      const res= await fetch(`/api/user/update/${currentUser._id}`,{
+        method:"POST",
+        headers:{
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+      const data = await res.json()
+      if(data.success === false){
+        dispatch(Failure(data.message))
+        toast({
+          icon: <MdError size={30} />,
+          className:"bg-red-600 text-white font-semibold font-poppins",
+          description:data.message ,
+        })
+        return
+      }
+      dispatch(Success(data))
+      toast({
+        icon: <BsFillBookmarkCheckFill size={30} />,
+        className:"bg-green-600 text-white font-semibold font-poppins",
+        description:"Update Successfully" ,
+      })
+    } catch (error) {
+        dispatch(Failure(error.message))
+        toast({
+          icon: <MdError size={30} />,
+          className:"bg-red-600 text-white font-semibold font-poppins",
+          description:error.message ,
+        })
+      
+    }
+  }
+
+  const handelDeleteUser= async ()=>{
+    try {
+      dispatch(Start())
+      const res= await fetch(`/api/user/delete/${currentUser._id}`,
+        {
+          method:"DELETE",
+        }
+      );
+
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(Failure(data.message))
+        return
+      }
+      dispatch(deleteUserSuccess(data))
+    } catch (error) {
+      dispatch(Failure(error.message))
+      toast({
+        icon: <MdError size={30} />,
+        className:"bg-red-600 text-white font-semibold font-poppins",
+        description:error.message ,
+      })
+    }
+  }
   
 
   return (
@@ -116,7 +206,7 @@ const Profile = () => {
               
 
                 <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-6">
-                  <form  className="space-y-4"  >
+                  <form onSubmit={handelSubmit}  className="space-y-4"  >
                        <input onChange={(e)=>setFile(e.target.files[0])} type="file" ref={fileRef} hidden accept="image/*" />               
                       <div className="mt-1">
                         <input
@@ -124,7 +214,7 @@ const Profile = () => {
                           name="username"
                           type="text"
                           autoComplete="username"
-
+                          onChange={handelChange}
                           defaultValue={currentUser.username}
                           placeholder="Username"
                           className="block w-full focus:outline-none rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
@@ -138,7 +228,7 @@ const Profile = () => {
                           name="email"
                           type="email"
                           autoComplete="email"
-                          
+                          onChange={handelChange}
                           defaultValue={currentUser.email}
                           placeholder="email address"              
                           className="block w-full focus:outline-none  rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
@@ -151,7 +241,7 @@ const Profile = () => {
                           type={isPasswordVisible ? "text" : "password"}
                           autoComplete="current-password"
                           placeholder="Password"
-                          
+                          onChange={handelChange}
                           
                           className="block focus:outline-none w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                         />
@@ -213,37 +303,53 @@ const Profile = () => {
                       </button>
                     </div>
 
-                    <div className="mt-3 py-5 border-t border-gray-300">
-                <div className="flex justify-between items-center ">
-                    <button
-                        disabled={loading}
-                        className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                      >
-                        {loading ? 
-                        <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg> :  <MdDelete size={20} />}
-                    </button>
+              </form>
 
-                    <button
-                        disabled={loading}
-                        className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                      >
-                        {loading ? 
-                        <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg> :  <PiSignOutBold size={20} />}
-                    </button>
-
-
-                    
+              <div className="mt-3 py-5 border-t border-gray-300">
+                  <div className="flex justify-between items-center ">
+      
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                            <button
+                                disabled={loading}
+                                className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                              >
+                                {loading ? 
+                                <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg> : <MdDelete size={20} />}
+                            </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="font-poppins">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete your
+                                  account and remove your data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handelDeleteUser} >Delete</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+     
+                            <button
+                                disabled={loading}
+                                className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                              >
+                                {loading ? 
+                                <svg className="mr-3 h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg> :  <PiSignOutBold size={20} />}
+                            </button>
+                                   
                   
                 </div>
               </div>
-
-              </form>
 
                 </div>
 

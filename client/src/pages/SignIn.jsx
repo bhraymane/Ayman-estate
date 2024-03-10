@@ -5,7 +5,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { BsFillBookmarkCheckFill } from "react-icons/bs";
 import { MdError } from "react-icons/md";
 import { useSelector, useDispatch } from 'react-redux'
-import { signInStart,signInSuccess,signInFailure } from '@/redux/user/userSlice';
+import { Start,Success,Failure } from '@/redux/user/userSlice';
 import { RiGoogleFill } from "react-icons/ri";
 import OAuth from '@/components/OAuth';
 
@@ -37,7 +37,7 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      dispatch(signInStart())
+      dispatch(Start())
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
@@ -48,7 +48,7 @@ const SignIn = () => {
       const data = await res.json();
       console.log(data.message);
       if (data.success === false) {
-        dispatch(signInFailure(data.message))
+        dispatch(Failure(data.message))
         toast({
           icon: <MdError size={30} />,
           className:"bg-red-600 text-white font-semibold font-poppins",
@@ -57,11 +57,11 @@ const SignIn = () => {
 
         return;
       }
-      dispatch(signInSuccess(data))
+      dispatch(Success(data))
       navigate('/')
       
     } catch (error) {
-      dispatch(signInFailure(error.message))
+      dispatch(Failure(error.message))
       toast({
         icon: <MdError size={30} />,
         className:"bg-red-600 text-white font-semibold font-poppins",
