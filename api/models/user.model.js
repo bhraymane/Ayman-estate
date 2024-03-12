@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     username :{
         type:"string",
-        require: true,
+        required: true,
         unique:true,
     },
     Profilename :{
@@ -12,12 +12,12 @@ const userSchema = new mongoose.Schema({
     },
     email :{
         type:"string",
-        require: true,
+        required: true,
         unique:true,
     },
     password :{
         type:"string",
-        require: true,
+        required: true,
     },
     avatar:{
         type:"string",

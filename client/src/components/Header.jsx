@@ -11,7 +11,7 @@ const Header = () => {
   const {currentUser} = useSelector((state)=> state.user)
 
   return (
-    <header className=' font-poppins fixed  z-50 top-0  w-full '>
+    <header className=' font-poppins fixed  z-50 top-0  w-full bg-white '>
       <div className='flex justify-between items-center max-w-screen-2xl mx-auto m-3 p-3 md:px-16'>
 
       
@@ -20,10 +20,10 @@ const Header = () => {
       </Link>
       
 
-      <div className='flex justify-between items-center gap-16 text-lg text-gray-400 max-lg:hidden '>
+      <div className='flex justify-between items-center gap-16 text-lg text-gray-800 max-lg:hidden '>
         <ul className='flex gap-6 items-center '>
         {navLinks.map((link,index)=>(
-          <li  key={index} className='hover:text-gray-800'>
+          <li  key={index} className='hover:text-gray-400'>
             <a href={link.href} > {link.label} </a>
           </li>
         ))}

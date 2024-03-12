@@ -1,20 +1,25 @@
 import React from 'react'
 import { BrowserRouter, Routes,Route } from "react-router-dom";
-import Home from "./pages/Home"
+
 import Profile from "./pages/Profile"
 import SignIn from "./pages/SignIn"
 import SignUp from "./pages/SignUp"
 import Header from './components/Header';
 import PrivateRoute from './components/PrivateRoute';
 
+import Page from './Page';
+import ProfileTow from './pages/ProfileTow';
+
 const App = () => {
   return (
       <BrowserRouter>
       <Header />
         <Routes>
-          <Route path='/' element={<Home />} />
-          <Route  element={<PrivateRoute />}>
-            <Route path='/profile' element={<Profile />} />
+          <Route path='/' element={<Page /> } />
+          <Route  element={<PrivateRoute />}>           
+            <Route path='/profileTow' element={<Profile />} />
+            <Route path='/profile' element={<ProfileTow />} />
+            
           </Route>
           <Route path='/sign-in' element={<SignIn />} />
           <Route path='/sign-up' element={<SignUp />} />

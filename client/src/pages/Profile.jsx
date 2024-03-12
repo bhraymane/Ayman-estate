@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from "react";
 import {  useSelector, useDispatch } from "react-redux";
 import {  FaUser } from "react-icons/fa";
-import OAuth from "@/components/OAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { PiSignOutBold } from "react-icons/pi";
 import { MdDelete, MdError } from "react-icons/md";
@@ -133,6 +132,11 @@ const Profile = () => {
       const data = await res.json();
       if(data.success === false){
         dispatch(Failure(data.message))
+        toast({
+          icon: <MdError size={30} />,
+          className:"bg-red-600 text-white font-semibold font-poppins",
+          description:data.message ,
+        })
         return
       }
       dispatch(deleteUserSuccess(data))
@@ -145,10 +149,35 @@ const Profile = () => {
       })
     }
   }
+
+  const handelSignOut= async()=>{
+    try {
+      const res= await fetch("/api/auth/signout")
+      const data =await res.json()
+      if (data.success === false){
+        dispatch(Failure(data.message))
+        toast({
+          icon: <MdError size={30} />,
+          className:"bg-red-600 text-white font-semibold font-poppins",
+          description:data.message ,
+        })
+        return
+      }
+      dispatch(deleteUserSuccess(data))
+    } catch (error) {
+        dispatch(Failure(error.message))
+        toast({
+          icon: <MdError size={30} />,
+          className:"bg-red-600 text-white font-semibold font-poppins",
+          description:error.message ,
+        })
+      
+    }
+  }
   
 
   return (
-    <div className="font-poppins">
+    <div className="font-poppins ">
       <section className="relative block h-[500px] max-sm:h-[400px] " >
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover brightness-50 "
@@ -337,6 +366,7 @@ const Profile = () => {
                           </AlertDialog>
      
                             <button
+                                onClick={handelSignOut}
                                 disabled={loading}
                                 className="flex  justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                               >
