@@ -117,13 +117,13 @@ const Informations = () => {
             <p>Account informations</p>
         </div>
 
-        <div className="flex mt-5 gap-5 max-[377px]:flex-col  max-[377px]:items-center">       
+        <div className="flex mt-5 gap-5 max-[377px]:flex-col  max-[377px]:items-center ">       
             <div className="" >
                 <img  alt="Profile"  src={  formData.avatar || currentUser.avatar  } className="shadow-lg rounded-full h-[120px] w-[100px] object-cover  "/>          
             </div>  
 
-            <div className='flex flex-col items-start'>
-                <h3 className="text-2xl font-semibold leading-normal text-gray-800 max-[450px]:text-lg  ">
+            <div className='flex flex-col items-start max-[377px]:items-center'>
+                <h3 className="text-2xl font-semibold leading-normal text-gray-800 max-[450px]:text-lg   ">
                   {currentUser.Profilename}
                 </h3>
                 <div className="text-sm text-gray-400 font-semibold flex justify-center items-center gap-2 max-[450px]:text-xs">

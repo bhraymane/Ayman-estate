@@ -8,7 +8,7 @@ import Header from './components/Header';
 import PrivateRoute from './components/PrivateRoute';
 
 import Page from './Page';
-import ProfileTow from './pages/ProfileTow';
+
 
 const App = () => {
   return (
@@ -17,9 +17,7 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Page /> } />
           <Route  element={<PrivateRoute />}>           
-            <Route path='/profileTow' element={<Profile />} />
-            <Route path='/profile' element={<ProfileTow />} />
-            
+            <Route path='/profile' element={<Profile />} />         
           </Route>
           <Route path='/sign-in' element={<SignIn />} />
           <Route path='/sign-up' element={<SignUp />} />

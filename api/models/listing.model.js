@@ -15,6 +15,10 @@ const listingSchema = new mongoose.Schema(
             type:String,
             required:true,
         },
+        city:{
+            type:String,
+            required:true,
+        },
         regularPrice:{
             type:Number,
             required:true,
@@ -23,6 +27,11 @@ const listingSchema = new mongoose.Schema(
             type:Number,
             required:true,
         },
+        space:{
+            type:Number,
+            required:true,
+        },
+
         bathrooms:{
             type:Number,
             required:true,
